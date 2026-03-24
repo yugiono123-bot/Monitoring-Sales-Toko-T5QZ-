@@ -1,4 +1,4 @@
-Putra_Ragiel
+ Web By:Putra_Ragiel
 <!DOCTYPE html>
 <html>
 <head>
@@ -53,7 +53,7 @@ width:100%;
 padding:12px;
 color:white;
 border:none;
-border-radius:5px;
+border-radius:10px;
 font-size:16px;
 cursor:pointer;
 margin-top:6px;
@@ -156,68 +156,92 @@ action="https://script.google.com/macros/s/AKfycbzglrN9ibDnbI3o4zwmrrxiFZjaZeTHn
 method="POST">
 
 Nama Pengisi
-<input type="text" name="nama_pengisi" placeholder="Wajib diisi" list="daftarnama" required>
+<input type="text" name="nama_pengisi" placeholder="Klik List Disamping Biar Cepat" list="daftarnama" required>
 
 Tanggal
-<input type="date" name="tanggal" required>
+<input type="date" name="tanggal" required >
 
 <div class="shift">
 
 <h3>SHIFT 1</h3>
 
 Initial ST01
-<input class="s1" list="daftarnama" name="initial_st01_s1">
+<input class="s1" list="daftarnama" name="initial_st01_s1" placeholder="Klik List Disamping Biar Cepat">
 
 STD ST01
-<input class="s1" name="std_st01_s1" type="number">
+<input class="s1" name="std_st01_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Sales ST01
-<input class="s1" name="sales_st01_s1" type="number">
+<input class="s1" name="sales_st01_s1" type="text" onkeyup="Number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Variance ST01
-<input class="s1" name="variance_st01_s1" type="number">
+<input class="s1" name="variance_st01_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Initial ST02
-<input class="s1" list="daftarnama" name="initial_st02_s1">
+<input class="s1" list="daftarnama" name="initial_st02_s1" placeholder="klik List Disamping Biar Cepat">
 
 STD ST02
-<input class="s1" name="std_st02_s1" type="number">
+<input class="s1" name="std_st02_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Sales ST02
-<input class="s1" name="sales_st02_s1" type="number">
+<input class="s1" name="sales_st02_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Variance ST02
-<input class="s1" name="variance_st02_s1" type="number">
+<input class="s1" name="variance_st02_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+
+
+<p class="warning">
+SEBELUM DI SAVE<br><br>
+CEK DULU YANG BENER JANGAN ASAL ISI...!
+</p>
 
 </div>
 
+<button type="button" onclick="saveShift('1')" class="btn1">
+SAVE SHIFT 1 DULU
+</button>
+
 <div class="shift">
+
+
+<br>
+
 
 <h3>SHIFT 2</h3>
 
 Initial ST01
-<input class="s2" list="daftarnama" name="initial_st01_s2">
+<input class="s2" list="daftarnama" name="initial_st01_s2" placeholder="klik List Disamping Biar Cepat">
 
 STD ST01
-<input class="s2" name="std_st01_s2" type="number">
+<input class="s2" name="std_st01_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Sales ST01
-<input class="s2" name="sales_st01_s2" type="number">
+<input class="s2" name="sales_st01_s2" type="number"placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Variance ST01
-<input class="s2" name="variance_st01_s2" type="number">
+<input class="s2" name="variance_st01_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Initial ST02
-<input class="s2" list="daftarnama" name="initial_st02_s2">
+<input class="s2" list="daftarnama" name="initial_st02_s2" placeholder="klik List Disamping Biar Cepat">
 
 STD ST02
-<input class="s2" name="std_st02_s2" type="number">
+<input class="s2" name="std_st02_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Sales ST02
-<input class="s2" name="sales_st02_s2" type="number">
+<input class="s2" name="sales_st02_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
 
 Variance ST02
-<input class="s2" name="variance_st02_s2" type="number">
+<input class="s2" name="variance_st02_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+
+<p class="warning">
+SEBELUM DI SAVE<br><br>
+CEK DULU YANG BENER JANGAN ASAL ISI...!
+</p>
+
+
+<button type="button" onclick="saveShift('2')" class="btn2">
+SAVE SHIFT 2
+</button>
 
 </div>
 
@@ -230,23 +254,6 @@ Variance ST02
 </datalist>
 
 <br>
-
-<p class="warning">
-SEBELUM DI SAVE<br><br>
-CEK DULU YANG BENER JANGAN ASAL ISI...!
-</p>
-
-<button type="button" onclick="saveShift('1')" class="btn1">
-SAVE SHIFT 1
-</button>
-
-<button type="button" onclick="saveShift('2')" class="btn2">
-SAVE SHIFT 2
-</button>
-
-<button type="button" onclick="saveShift('12')" class="btn3">
-SAVE SHIFT 1 & 2
-</button>
 
 </form>
 
