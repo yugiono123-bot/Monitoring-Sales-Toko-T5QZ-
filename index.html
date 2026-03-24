@@ -1,0 +1,257 @@
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<title>INPUT MONITORING KPI SALES</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+font-family: Arial;
+padding:20px;
+
+/* BACKGROUND FOTO DARI FOLDER YANG SAMA */
+background-image:url("background.jpeg");
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+background-attachment:fixed;
+}
+
+.container{
+background:white;
+padding:20px;
+border-radius:10px;
+max-width:500px;
+margin:auto;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+h2,h3{
+text-align:center;
+color:#333;
+}
+
+#jam{
+text-align:center;
+font-weight:bold;
+margin-top:10px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:5px 0;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+width:100%;
+padding:12px;
+color:white;
+border:none;
+border-radius:5px;
+font-size:16px;
+cursor:pointer;
+margin-top:6px;
+}
+
+.btn1{background:#28a745;}
+.btn2{background:#007bff;}
+.btn3{background:#ff9800;}
+
+.shift{
+background:white;
+padding:10px;
+margin-top:15px;
+border-radius:5px;
+border:1px solid #ddd;
+}
+
+.warning{
+text-align:center;
+font-weight:bold;
+color:red;
+}
+
+</style>
+
+<script>
+
+function updateJam(){
+
+var sekarang = new Date();
+
+var hari = sekarang.getDate();
+var bulan = sekarang.getMonth()+1;
+var tahun = sekarang.getFullYear();
+
+var jam = sekarang.getHours();
+var menit = sekarang.getMinutes();
+var detik = sekarang.getSeconds();
+
+document.getElementById("jam").innerHTML =
+hari+"/"+bulan+"/"+tahun+" - "+jam+":"+menit+":"+detik;
+
+}
+
+setInterval(updateJam,1000);
+
+
+/* FUNGSI TOMBOL SHIFT */
+
+function saveShift(type){
+
+var s1=document.querySelectorAll(".s1");
+var s2=document.querySelectorAll(".s2");
+
+if(type=="1"){
+
+s1.forEach(i=>i.disabled=false);
+s2.forEach(i=>i.disabled=true);
+
+}
+
+if(type=="2"){
+
+s1.forEach(i=>i.disabled=true);
+s2.forEach(i=>i.disabled=false);
+
+}
+
+if(type=="12"){
+
+s1.forEach(i=>i.disabled=false);
+s2.forEach(i=>i.disabled=false);
+
+}
+
+document.getElementById("formKPI").submit();
+
+}
+
+</script>
+
+</head>
+
+<body onload="updateJam()">
+
+<div class="container">
+
+<h2>INPUT MONITORING KPI SALES</h2>
+<h3>TOKO T5QZ TAHUN 2026</h3>
+
+<img src="https://th.bing.com/th/id/R.e34e1dc0e8620fe0264c5f930fae02fc?rik=RMmObpLZR%2b3GKQ&riu=http%3a%2f%2f4.bp.blogspot.com%2f-aYf8Pb9g4Uo%2fUzqMG0pOlgI%2fAAAAAAAADQw%2f1Mm6Bq5H3i8%2fs1600%2flogo%2bsi%2bdomar%2bindomaret%2bvector.jpg&ehk=1pHAMnWXX0XYyLanFUMKlzJIB3Rl%2b%2bYgN2vpLWlHpyQ%3d&risl=&pid=ImgRaw&r=0"
+width="150" style="display:block;margin:auto;">
+
+<div id="jam"></div>
+
+<br>
+
+<form id="formKPI"
+action="https://script.google.com/macros/s/AKfycbzglrN9ibDnbI3o4zwmrrxiFZjaZeTHnkvgMMpxhe0/exec"
+method="POST">
+
+Nama Pengisi
+<input type="text" name="nama_pengisi" placeholder="Wajib diisi" list="daftarnama" required>
+
+Tanggal
+<input type="date" name="tanggal" required>
+
+<div class="shift">
+
+<h3>SHIFT 1</h3>
+
+Initial ST01
+<input class="s1" list="daftarnama" name="initial_st01_s1">
+
+STD ST01
+<input class="s1" name="std_st01_s1" type="number">
+
+Sales ST01
+<input class="s1" name="sales_st01_s1" type="number">
+
+Variance ST01
+<input class="s1" name="variance_st01_s1" type="number">
+
+Initial ST02
+<input class="s1" list="daftarnama" name="initial_st02_s1">
+
+STD ST02
+<input class="s1" name="std_st02_s1" type="number">
+
+Sales ST02
+<input class="s1" name="sales_st02_s1" type="number">
+
+Variance ST02
+<input class="s1" name="variance_st02_s1" type="number">
+
+</div>
+
+<div class="shift">
+
+<h3>SHIFT 2</h3>
+
+Initial ST01
+<input class="s2" list="daftarnama" name="initial_st01_s2">
+
+STD ST01
+<input class="s2" name="std_st01_s2" type="number">
+
+Sales ST01
+<input class="s2" name="sales_st01_s2" type="number">
+
+Variance ST01
+<input class="s2" name="variance_st01_s2" type="number">
+
+Initial ST02
+<input class="s2" list="daftarnama" name="initial_st02_s2">
+
+STD ST02
+<input class="s2" name="std_st02_s2" type="number">
+
+Sales ST02
+<input class="s2" name="sales_st02_s2" type="number">
+
+Variance ST02
+<input class="s2" name="variance_st02_s2" type="number">
+
+</div>
+
+<datalist id="daftarnama">
+<option value="YUGIONO">
+<option value="MELANI">
+<option value="EVA">
+<option value="DIKA">
+<option value="JAPAR">
+</datalist>
+
+<br>
+
+<p class="warning">
+SEBELUM DI SAVE<br><br>
+CEK DULU YANG BENER JANGAN ASAL ISI...!
+</p>
+
+<button type="button" onclick="saveShift('1')" class="btn1">
+SAVE SHIFT 1
+</button>
+
+<button type="button" onclick="saveShift('2')" class="btn2">
+SAVE SHIFT 2
+</button>
+
+<button type="button" onclick="saveShift('12')" class="btn3">
+SAVE SHIFT 1 & 2
+</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
+```
