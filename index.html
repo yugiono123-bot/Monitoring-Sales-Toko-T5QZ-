@@ -1,4 +1,5 @@
- Web By:Putra_Ragiel
+Website By : Putra_Ragiel
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +13,6 @@ body{
 font-family: Arial;
 padding:20px;
 
-/* BACKGROUND FOTO DARI FOLDER YANG SAMA */
 background-image:url("background.jpeg");
 background-size:cover;
 background-position:center;
@@ -53,14 +53,14 @@ width:100%;
 padding:12px;
 color:white;
 border:none;
-border-radius:10px;
+border-radius:5px;
 font-size:16px;
 cursor:pointer;
 margin-top:6px;
 }
 
 .btn1{background:#28a745;}
-.btn2{background:#007bff;}
+.btn2{background:#28a745;}
 .btn3{background:#ff9800;}
 
 .shift{
@@ -101,9 +101,18 @@ hari+"/"+bulan+"/"+tahun+" - "+jam+":"+menit+":"+detik;
 setInterval(updateJam,1000);
 
 
-/* FUNGSI TOMBOL SHIFT */
 
 function saveShift(type){
+
+var nama = document.querySelector('input[name="nama_pengisi"]').value;
+var tanggal = document.querySelector('input[name="tanggal"]').value;
+
+if(nama=="" || tanggal==""){
+
+alert("NAMA PENGISI DAN TANGGAL WAJIB DIISI !");
+return;
+
+}
 
 var s1=document.querySelectorAll(".s1");
 var s2=document.querySelectorAll(".s2");
@@ -152,96 +161,91 @@ width="150" style="display:block;margin:auto;">
 <br>
 
 <form id="formKPI"
-action="https://script.google.com/macros/s/AKfycbzglrN9ibDnbI3o4zwmrrxiFZjaZeTHnkvgMMpxhe0/exec"
+action="https://script.google.com/macros/s/AKfycbzglrN9ibDnbI3o4zwmrrxiFZjaZeTHnkvgMMpxhe0/dev/exec"
 method="POST">
 
 Nama Pengisi
-<input type="text" name="nama_pengisi" placeholder="Klik List Disamping Biar Cepat" list="daftarnama" required>
+<input type="text" name="nama_pengisi" placeholder="Wajib Di Isi Biar Bisa Di Save" list="daftarnama" required>
 
 Tanggal
-<input type="date" name="tanggal" required >
+<input type="date" name="tanggal" required>
 
 <div class="shift">
 
 <h3>SHIFT 1</h3>
 
 Initial ST01
-<input class="s1" list="daftarnama" name="initial_st01_s1" placeholder="Klik List Disamping Biar Cepat">
+<input class="s1" list="daftarnama" name="initial_st01_s1" placeholder="Di Isi Yang Bener Jangan Asal...!">
 
-STD ST01
-<input class="s1" name="std_st01_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+Std ST01
+<input class="s1" name="std_st01_s1" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Sales ST01
-<input class="s1" name="sales_st01_s1" type="text" onkeyup="Number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+<input class="s1" name="sales_st01_s1" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Variance ST01
-<input class="s1" name="variance_st01_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+<input class="s1" name="variance_st01_s1" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Initial ST02
-<input class="s1" list="daftarnama" name="initial_st02_s1" placeholder="klik List Disamping Biar Cepat">
+<input class="s1" list="daftarnama" name="initial_st02_s1"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
-STD ST02
-<input class="s1" name="std_st02_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+Std ST02
+<input class="s1" name="std_st02_s1" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Sales ST02
-<input class="s1" name="sales_st02_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+<input class="s1" name="sales_st02_s1" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Variance ST02
-<input class="s1" name="variance_st02_s1" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
-
+<input class="s1" name="variance_st02_s1" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 <p class="warning">
 SEBELUM DI SAVE<br><br>
 CEK DULU YANG BENER JANGAN ASAL ISI...!
 </p>
 
-</div>
-
 <button type="button" onclick="saveShift('1')" class="btn1">
-SAVE SHIFT 1 DULU
+KLIK DI SINI BUAT SAVE SHIFT 1 
 </button>
 
+</div>
+
 <div class="shift">
-
-
-<br>
-
 
 <h3>SHIFT 2</h3>
 
 Initial ST01
-<input class="s2" list="daftarnama" name="initial_st01_s2" placeholder="klik List Disamping Biar Cepat">
+<input class="s2" list="daftarnama" name="initial_st01_s2"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
-STD ST01
-<input class="s2" name="std_st01_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+Std ST01
+<input class="s2" name="std_st01_s2" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Sales ST01
-<input class="s2" name="sales_st01_s2" type="number"placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+<input class="s2" name="sales_st01_s2" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Variance ST01
-<input class="s2" name="variance_st01_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+<input class="s2" name="variance_st01_s2" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Initial ST02
-<input class="s2" list="daftarnama" name="initial_st02_s2" placeholder="klik List Disamping Biar Cepat">
+<input class="s2" list="daftarnama" name="initial_st02_s2"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
-STD ST02
-<input class="s2" name="std_st02_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+Std ST02
+<input class="s2" name="std_st02_s2" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Sales ST02
-<input class="s2" name="sales_st02_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+<input class="s2" name="sales_st02_s2" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 Variance ST02
-<input class="s2" name="variance_st02_s2" type="number" placeholder="Isi Yang Bener Jangan Sampai Salah...!">
+<input class="s2" name="variance_st02_s2" type="number"placeholder="Di Isi Yang Bener Jangan Asal...!">
 
 <p class="warning">
 SEBELUM DI SAVE<br><br>
 CEK DULU YANG BENER JANGAN ASAL ISI...!
 </p>
 
-
 <button type="button" onclick="saveShift('2')" class="btn2">
-SAVE SHIFT 2
+KLIK BUAT SAVE SHIFT 2
 </button>
+
 
 </div>
 
@@ -255,10 +259,13 @@ SAVE SHIFT 2
 
 <br>
 
+<button type="button" onclick="saveShift('12')" class="btn3">
+KLIK BUAT SAVE SHIFT 1 & 2 LANGSUNG
+</button>
+
 </form>
 
 </div>
 
 </body>
 </html>
-```
