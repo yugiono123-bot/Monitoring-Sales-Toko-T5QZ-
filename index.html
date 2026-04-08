@@ -1,183 +1,174 @@
-Website By : Putra_Ragiel
+Website by:putra_ragiel
 
 <!DOCTYPE html>
 <html>
 <head>
-<title>INPUT MONITORING KPI SALES</title>
-<meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 
 body{
-font-family: Arial;
+font-family:Arial;
 padding:20px;
-
-background-image:url("background.jpeg");
+background-image:url("https://i.ytimg.com/vi/l_42kAPDVX4/maxresdefault.jpg");
 background-size:cover;
 background-position:center;
 background-repeat:no-repeat;
 background-attachment:fixed;
 }
 
-.container{
-background:white;
+.app{
+background:rgba(255,255,255,0.95);
 padding:20px;
-border-radius:10px;
-max-width:500px;
+border-radius:12px;
+max-width:520px;
 margin:auto;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
 
-h2,h3{
-text-align:center;
-color:#333;
-}
-
-#jam{
-text-align:center;
-font-weight:bold;
-margin-top:10px;
-}
-
-input{
-width:100%;
-padding:10px;
-margin:5px 0;
-border:1px solid #ccc;
-border-radius:5px;
+.logo{
+display:block;
+margin:auto;
+width:150px;
 }
 
 button{
 width:100%;
 padding:12px;
+margin-top:10px;
+background:#27ae60;
 color:white;
 border:none;
-border-radius:5px;
-font-size:16px;
-cursor:pointer;
-margin-top:6px;
+border-radius:6px;
 }
 
-.btn1{background:#28a745;}
-.btn2{background:#28a745;}
-.btn3{background:#ff9800;}
-
-.shift{
-background:white;
+input,select{
+width:100%;
 padding:10px;
-margin-top:15px;
-border-radius:5px;
-border:1px solid #ddd;
+margin:5px 0;
 }
 
-.warning{
-text-align:center;
-font-weight:bold;
-color:red;
+.hidden{
+display:none;
+}
+
+.shift1{
+display:none;
+}
+
+.shift2{
+display:none;
+}
+
+h3{text-align: center;}
+
+h4{
+    text-align: center;
+    font-style: italic;
 }
 
 </style>
 
+
 <script>
 
-function updateJam(){
-
-var sekarang = new Date();
-
-var hari = sekarang.getDate();
-var bulan = sekarang.getMonth()+1;
-var tahun = sekarang.getFullYear();
-
-var jam = sekarang.getHours();
-var menit = sekarang.getMinutes();
-var detik = sekarang.getSeconds();
-
-document.getElementById("jam").innerHTML =
-hari+"/"+bulan+"/"+tahun+" - "+jam+":"+menit+":"+detik;
-
+function bukaSales(){
+document.getElementById("menu").style.display="none";
+document.getElementById("sales").style.display="block";
 }
 
-setInterval(updateJam,1000);
-
-
-
-function saveShift(type){
-
-var nama = document.querySelector('input[name="nama_pengisi"]').value;
-var tanggal = document.querySelector('input[name="tanggal"]').value;
-
-if(nama=="" || tanggal==""){
-
-alert("NAMA PENGISI DAN TANGGAL WAJIB DI ISI YA CUK UDAH DI INGETIN JUGA!!!");
-return;
-
+function bukaMurah(){
+document.getElementById("menu").style.display="none";
+document.getElementById("murah").style.display="block";
 }
 
-var s1=document.querySelectorAll(".s1");
-var s2=document.querySelectorAll(".s2");
+function kembali(){
+document.getElementById("sales").style.display="none";
+document.getElementById("murah").style.display="none";
+document.getElementById("menu").style.display="block";
+}
+
+function pilihShift(type){
+
+var s1=document.querySelector(".shift1");
+var s2=document.querySelector(".shift2");
 
 if(type=="1"){
-
-s1.forEach(i=>i.disabled=false);
-s2.forEach(i=>i.disabled=true);
-
+s1.style.display="block";
+s2.style.display="none";
 }
 
 if(type=="2"){
-
-s1.forEach(i=>i.disabled=true);
-s2.forEach(i=>i.disabled=false);
-
+s1.style.display="none";
+s2.style.display="block";
 }
 
 if(type=="12"){
-
-s1.forEach(i=>i.disabled=false);
-s2.forEach(i=>i.disabled=false);
-
+s1.style.display="block";
+s2.style.display="block";
+}
 }
 
-document.getElementById("formKPI").submit();
-
-}
+</script>
 
 </script>
 
 </head>
 
-<body onload="updateJam()">
+<body>
 
-<div class="container">
+<div class="app">
 
-<h2>MONITORING KPI SALES</h2>
-<h3>TOKO T5QZ TAHUN 2026</h3>
+<img class="logo" src="https://th.bing.com/th/id/R.e34e1dc0e8620fe0264c5f930fae02fc?rik=RMmObpLZR%2b3GKQ">
 
-<img src="https://th.bing.com/th/id/R.e34e1dc0e8620fe0264c5f930fae02fc?rik=RMmObpLZR%2b3GKQ&riu=http%3a%2f%2f4.bp.blogspot.com%2f-aYf8Pb9g4Uo%2fUzqMG0pOlgI%2fAAAAAAAADQw%2f1Mm6Bq5H3i8%2fs1600%2flogo%2bsi%2bdomar%2bindomaret%2bvector.jpg&ehk=1pHAMnWXX0XYyLanFUMKlzJIB3Rl%2b%2bYgN2vpLWlHpyQ%3d&risl=&pid=ImgRaw&r=0"
-width="150" style="display:block;margin:auto;">
+<h2 style="text-align:center;">APLIKASI MONITORING TOKO</h2>
 
-<div id="jam"></div>
+<div id="menu">
+
+<button onclick="bukaSales()">📊 MONITORING KPI SALES</button>
+<button onclick="bukaMurah()">💰 MONITORING PALING MURAH</button>
+
+</div>
 
 
+<!-- KPI SALES -->
 
-   
-<br>
+<div id="sales" class="hidden">
+
+<h2 style="text-align:center;">INPUT MONITORING KPI SALES</h2>
 
 <form id="formKPI"
 action="https://script.google.com/macros/s/AKfycbzglrN9ibDnbI3o4zwmrrxiFZjaZeTHnkvgMMpxhe0/dev/exec"
 method="POST">
 
 
-   
-  <br>
+<h3>TOKO T5QZ TAHUN 2026</h3>
 
 Nama Pengisi
-<input type="text" name="nama_pengisi" placeholder="Wajib Di Isi Biar Bisa Di Save" list="daftarnama" required>
+<input type="text" name="nama_pengisi" list="listNama" required>
+
+<datalist id="listNama">
+<option value="YUGIONO">
+<option value="MELANI">
+<option value="EVA">
+<option value="DIKA">
+<option value="JAPAR">
+</datalist>
 
 Tanggal
 <input type="date" name="tanggal" required>
 
-<div class="shift">
+<h3>PILIH SHIFT</h3>
+
+<select onchange="pilihShift(this.value)">
+<option value="">Pilih Shift</option>
+<option value="1">SHIFT 1</option>
+<option value="2">SHIFT 2</option>
+<option value="12">SHIFT 1 & 2</option>
+</select>
+
+
+<div class="shift1">
 
 <h3>SHIFT 1</h3>
 
@@ -210,13 +201,10 @@ SEBELUM DI SAVE<br><br>
 CEK DULU YANG BENER JANGAN ASAL ISI RIBET BENERIN NYA KALO SALAH...!
 </p>
 
-<button type="button" onclick="saveShift('1')" class="btn1">
-KLIK DI SINI BUAT SAVE SHIFT 1 NYA
-</button>
-
 </div>
 
-<div class="shift">
+
+<div class="shift2">
 
 <h3>SHIFT 2</h3>
 
@@ -248,13 +236,13 @@ Variance ST02
 SEBELUM DI SAVE<br><br>
 CEK DULU YANG BENER JANGAN ASAL ISI RIBET BENERIN NYA KALO SALAH...!
 </p>
-
-<button type="button" onclick="saveShift('2')" class="btn2">
-KLIK DISINI YA BUAT SAVE SHIFT 2 NYA
-</button>
-
-
 </div>
+
+<button type="submit">SIMPAN DATA</button>
+
+</form>
+
+<button onclick="kembali()">KEMBALI</button>
 
 <datalist id="daftarnama">
 <option value="YUGIONO">
@@ -264,15 +252,55 @@ KLIK DISINI YA BUAT SAVE SHIFT 2 NYA
 <option value="JAPAR">
 </datalist>
 
-<br>
-
-<button type="button" onclick="saveShift('12')" class="btn3">
-KLIK BUAT SAVE SHIFT 1 & 2 SECARA BERSAMAN
-</button>
-
-</form>
 
 </div>
 
-</body>
-</html>
+
+
+
+
+<!-- PALING MURAH -->
+<div id="murah" class="hidden">
+
+<h2 style="text-align:center;">INPUT MONITORING PALING MURAH</h2>
+
+<h3>TOKO T5QZ TAHUN 2026</h3>
+<h4>periode : 9 - 15 April 2026</h4>
+
+<form method="POST" action="https://script.google.com/macros/s/AKfycbzglrN9ibDnbI3o4zwmrrxiFZjaZeTHnkvgMMpxhe0/dev">
+
+  <input type="hidden" name="mode" value="murah">
+
+  <br>
+
+  Tanggal Sales<br> 
+  <input type="date" name="tanggal" required><br><br>
+
+
+  <h4>ITEM PALING MURAH PERIODE SEKARANG</h4>
+
+  1.Aqua 600ml<br><input type="number" name="i1" placeholder="Plu main: 10003814"> <br>
+  2.Tisue indomaret<br><input type="number" name="i2" placeholder="Plu main: 20124726"><br>
+  3.Teh pucuk 350ml<br><input type="number" name="i3" placeholder="Plu main: 20035484,20048155"><br>
+  4.Sunlight 910ml<br><input type="number" name="i4" placeholder="Plu main: 20112494,20139728"><br>
+  5.Mie sedap<br><input type="number" name="i5" placeholder="Plu main: 10023789,10023792,"><br>
+  6.Nabati<br><input type="number" name="i6" placeholder="Plu main: 20055312,20055311"><br>
+  7.Aice<br><input type="number" name="i7" placeholder="Plu main: 20113120,20134511"><br>
+  8.Collagena<br><input type="number" name="i8" placeholder="Plu main: 20134968"><br>
+  9.Lifebuoy<br><input type="number" name="i9" placeholder="Plu main: 20011008,20041399"><br>
+  10.Shampo Zinc<br><input type="number" name="i10" placeholder="Plu main: 20040609,20040608"><br>
+  11.So Klin<br><input type="number" name="i11" placeholder="Plu main: 20099414,20041483"><br>
+  12.Kebanyakan Bos<br><input type="number" name="i12" placeholder="jangan di isi biar cepet!!!"><br><br>
+
+  <p class="warning">
+    SEBELUM DI SAVE<br><br>
+    CEK DULU YANG BENER JANGAN ASAL ISI RIBET BENERIN NYA KALO SALAH...!
+  </p>
+
+  <button type="submit">SIMPAN</button>
+
+</form>
+
+<button onclick="kembali()">KEMBALI</button>
+
+</div>
