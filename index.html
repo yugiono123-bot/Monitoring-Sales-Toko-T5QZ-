@@ -125,14 +125,16 @@ s2.style.display="block";
 
 <div id="menu">
 
-<button onclick="bukaSales()"> MONITORING KPI SALES</button>
+<button onclick="bukaSales()"> MONITORING SALES</button>
 <button onclick="bukaMurah()"> MONITORING PALING MURAH</button>
-<button onclick="bukaSheet()">CEK HASIL INPUTAN</button>
+<button onclick="bukaSheet()">CEK SEMUA INPUTAN</button>
+
 <script>
 function bukaSheet(){
 window.open("https://docs.google.com/spreadsheets/d/1Uj0LwoTZc3rFNei8UQ-tzH2zcS329PUXmxqh6MyEm18/edit?usp=drivesdk");
 }
 </script>
+
 </div>
 
 
@@ -276,26 +278,46 @@ CEK DULU YANG BENER JANGAN ASAL ISI RIBET BENERIN NYA KALO SALAH...!
 
   <input type="hidden" name="mode" value="murah">
 
+  Nama Pengisi
+<input type="text" name="nama" list="listNama" required>
+
+<datalist id="listNama">
+<option value="YUGIONO">
+<option value="MELANI">
+<option value="EVA">
+<option value="DIKA">
+<option value="JAPAR">
+</datalist>
+
   <br>
 
   Tanggal Sales<br> 
   <input type="date" name="tanggal" required><br><br>
 
+  Pilih Shift
+<select name="shift" required>
+<option value="">Pilih Shift</option>
+<option value="1">SHIFT 1</option>
+<option value="2">SHIFT 2</option>
+</select>
+
+<br><br>
+
 
   <h4>ITEM PALING MURAH PERIODE SEKARANG</h4>
 
-  1.Aqua 600ml<br><input type="number" name="i1" placeholder="Plu main: 10003814"> <br>
-  2.Tisue indomaret<br><input type="number" name="i2" placeholder="Plu main: 20124726"><br>
-  3.Teh pucuk 350ml<br><input type="number" name="i3" placeholder="Plu main: 20035484,20048155"><br>
-  4.Sunlight 910ml<br><input type="number" name="i4" placeholder="Plu main: 20112491,20139728"><br>
-  5.Mie sedap<br><input type="number" name="i5" placeholder="Plu main: 10023789,10023792,"><br>
-  6.Nabati<br><input type="number" name="i6" placeholder="Plu main: 20055312,20055311"><br>
-  7.Aice<br><input type="number" name="i7" placeholder="Plu main: 20113120,20134511"><br>
-  8.Collagena<br><input type="number" name="i8" placeholder="Plu main: 20134968"><br>
-  9.Lifebuoy<br><input type="number" name="i9" placeholder="Plu main: 20011008,20041399"><br>
-  10.Shampo Zinc<br><input type="number" name="i10" placeholder="Plu main: 20040609,20040608"><br>
-  11.So Klin<br><input type="number" name="i11" placeholder="Plu main: 20099414,20041483"><br>
-  12.Kebanyakan Bos<br><input type="number" name="i12" placeholder="jangan di isi biar cepet!!!"><br><br>
+  1.Frisian Flag<br><input type="number" name="i1" placeholder="plu belum update"> <br>
+  2.Indomaret Soes<br><input type="number" name="i2" placeholder="plu belum update"><br>
+  3.Kodomo<br><input type="number" name="i3" placeholder="plu belum update"><br>
+  4.Kilau Nipis<br><input type="number" name="i4" placeholder="plu belum update"><br>
+  5.Lee Mineral 600ml<br><input type="number" name="i5" placeholder="plu belum update"><br>
+  6.Quaker 800g<br><input type="number" name="i6" placeholder="plu belum update"><br>
+  7.Fiesta<br><input type="number" name="i7" placeholder="plu belum update"><br>
+  8.Nice Tissue<br><input type="number" name="i8" placeholder="plu belum update"><br>
+  9.Nuvo 400ml<br><input type="number" name="i9" placeholder="plu belum update"><br>
+  10.Cadangan 1<br><input type="number" name="i10" placeholder="jangan di isi biar cepet!!!"><br>
+  11.Cadangan 2<br><input type="number" name="i11" placeholder="jangan di isi biar cepet!!!"><br>
+  12.Cadangan 3<br><input type="number" name="i12" placeholder="jangan di isi biar cepet!!!"><br><br>
 
   <p class="warning">
     SEBELUM DI SAVE<br><br>
