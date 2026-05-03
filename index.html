@@ -82,6 +82,12 @@ document.getElementById("menu").style.display="none";
 document.getElementById("murah").style.display="block";
 }
 
+function bukaKWH(){
+document.getElementById("menu").style.display="none";
+document.getElementById("kwh").style.display="block";
+}
+
+
 function kembali(){
 document.getElementById("sales").style.display="none";
 document.getElementById("murah").style.display="none";
@@ -127,6 +133,7 @@ s2.style.display="block";
 
 <button onclick="bukaSales()"> MONITORING SALES</button>
 <button onclick="bukaMurah()"> MONITORING PALING MURAH</button>
+<button onclick="bukaKWH()">MONITORING KWH</button>
 <button onclick="bukaSheet()">CEK SEMUA INPUTAN</button>
 
 <script>
@@ -331,3 +338,76 @@ CEK DULU YANG BENER JANGAN ASAL ISI RIBET BENERIN NYA KALO SALAH...!
 <button onclick="kembali()">KEMBALI</button>
 
 </div>
+
+<!-- ================= KWH ================= -->
+
+<div id="kwh" class="hidden">
+
+<h2 style="text-align:center;">INPUT MONITORING KWH</h2>
+INPUT SETIAP HARI DI JAM O6:00 - 08:00 <br>
+
+
+<form>
+<br>
+<label>TANGGAL</label>
+<input type="date" id="kwh_tanggal" required>
+
+<label>NAMA PENGISI</label>
+<input type="text" id="kwh_nama" list="listNama" required>
+
+<label>KWH TERAKHIR</label>
+<input type="number" id="kwh_akhir" required>
+
+<button type="button" onclick="simpanKWH()">SIMPAN DATA</button>
+
+</form>
+
+<div id="hasilKWH"></div>
+
+<button onclick="kembali()">KEMBALI</button>
+
+</div>
+
+<script>
+const scriptKWH = "https://script.google.com/macros/s/AKfycbzglrN9ibDnbI3o4zwmrrxiFZjaZeTHnkvgMMpxhe0/dev";
+
+function simpanKWH(){
+
+let t=document.getElementById("kwh_tanggal").value;
+let n=document.getElementById("kwh_nama").value;
+let k=document.getElementById("kwh_akhir").value;
+
+if(!t||!n||!k){
+alert("Isi semua data!");
+return;
+}
+
+// bikin form hidden (cara paling stabil ke GAS)
+let form = document.createElement("form");
+form.method = "POST";
+form.action = scriptKWH;
+
+// data dikirim sebagai parameter biasa (bukan JSON)
+let data = {
+mode:"kwh",
+tanggal:t,
+nama:n,
+kwh:k
+};
+
+for(let key in data){
+let input = document.createElement("input");
+input.type = "hidden";
+input.name = key;
+input.value = data[key];
+form.appendChild(input);
+}
+
+document.body.appendChild(form);
+form.submit();
+
+}
+</script>
+
+</body>
+</html>
