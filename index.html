@@ -69,6 +69,8 @@ h4{
 
 /* TAMBAHAN CEK INPUTAN */
 #hasilCekMonitoring{
+overflow-x:auto;
+-webkit-overflow-scrolling:touch;
 margin-top:12px;
 overflow:auto;
 max-height:70vh;
@@ -632,36 +634,158 @@ hasil.innerHTML=
 return;
 }
 
+let values=data.values;
 let hiddenCols=data.hiddenColumns || [];
 let hiddenRows=data.hiddenRows || [];
 let widths=data.columnWidths || [];
 let styles=data.styles || [];
+let merges=data.mergedRanges || [];
 
-let html="<table style='border-collapse:collapse;width:max-content;min-width:100%;font-size:12px;'>";
+let hiddenColSet=new Set(hiddenCols);
+let hiddenRowSet=new Set(hiddenRows);
 
-for(let r=0;r<data.values.length;r++){
+let mergeMap={};
+let covered={};
 
-if(hiddenRows.indexOf(r+1)!==-1) continue;
+merges.forEach(function(m){
+
+let r1=m.row;
+let c1=m.col;
+let r2=r1+m.rowspan-1;
+let c2=c1+m.colspan-1;
+
+mergeMap[r1+"_"+c1]={
+rowspan:m.rowspan,
+colspan:m.colspan
+};
+
+for(let r=r1;r<=r2;r++){
+for(let c=c1;c<=c2;c++){
+
+if(r===r1 && c===c1) continue;
+
+covered[r+"_"+c]=true;
+
+}
+}
+
+});
+
+function visibleCount(start,count,set){
+
+let n=0;
+
+for(
+let x=start;
+x<start+count;
+x++
+){
+
+if(!set.has(x)) n++;
+
+}
+
+return Math.max(1,n);
+
+}
+
+let html=
+"<table style='border-collapse:collapse;width:max-content;min-width:100%;table-layout:fixed;'>";
+
+html+="<colgroup>";
+
+for(
+let c=1;
+c<=values[0].length;
+c++
+){
+
+if(hiddenColSet.has(c)) continue;
+
+let w=widths[c-1] || 100;
+
+html+=
+"<col style='width:"+
+w+
+"px;min-width:"+
+w+
+"px;'>";
+
+}
+
+html+="</colgroup>";
+
+for(
+let r=1;
+r<=values.length;
+r++
+){
+
+if(hiddenRowSet.has(r)) continue;
 
 html+="<tr>";
 
-for(let c=0;c<data.values[r].length;c++){
+for(
+let c=1;
+c<=values[r-1].length;
+c++
+){
 
-if(hiddenCols.indexOf(c+1)!==-1) continue;
+if(hiddenColSet.has(c)) continue;
 
-let cellStyle=(styles[r] && styles[r][c]) ? styles[r][c] : "";
-let width=(widths[c] ? "width:"+widths[c]+"px;min-width:"+widths[c]+"px;" : "");
+if(covered[r+"_"+c]) continue;
 
-let tag=(r===0 ? "th" : "td");
+let tag=(r===1 ? "th" : "td");
 
-html+="<"+tag+" style='"+width+cellStyle+
-"white-space:pre-wrap;box-sizing:border-box;'>"+
-escapeHTML(data.values[r][c])+
+let cellStyle=
+(styles[r-1] &&
+ styles[r-1][c-1])
+?
+styles[r-1][c-1]
+:
+"";
+
+let merge=
+mergeMap[r+"_"+c];
+
+let rowspan="";
+let colspan="";
+
+if(merge){
+
+rowspan=
+" rowspan='"+visibleCount(
+r,
+merge.rowspan,
+hiddenRowSet
+)+"'";
+
+colspan=
+" colspan='"+visibleCount(
+c,
+merge.colspan,
+hiddenColSet
+)+"'";
+
+}
+
+html+="<"+tag+
+rowspan+
+colspan+
+" style='"+
+cellStyle+
+"border:1px solid #b7b7b7;"+
+"box-sizing:border-box;"+
+"white-space:pre-wrap;"+
+"overflow:hidden;"+
+"'>"+
+escapeHTML(values[r-1][c-1])+
 "</"+tag+">";
 
 }
 
 html+="</tr>";
+
 }
 
 html+="</table>";
