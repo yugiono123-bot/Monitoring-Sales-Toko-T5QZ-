@@ -67,6 +67,47 @@ h4{
     font-style: italic;
 }
 
+/* TAMBAHAN CEK INPUTAN */
+#hasilCekMonitoring{
+margin-top:12px;
+overflow:auto;
+max-height:70vh;
+background:#fff;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+#hasilCekMonitoring table{
+border-collapse:collapse;
+width:max-content;
+min-width:100%;
+font-size:12px;
+}
+
+#hasilCekMonitoring th{
+background:#27ae60;
+color:white;
+font-weight:bold;
+position:sticky;
+top:0;
+z-index:2;
+}
+
+#hasilCekMonitoring th,
+#hasilCekMonitoring td{
+border:1px solid #b7b7b7;
+padding:4px 6px;
+white-space:pre-wrap;
+vertical-align:middle;
+}
+
+#loadingCekMonitoring{
+display:none;
+text-align:center;
+padding:20px;
+font-weight:bold;
+}
+
 </style>
 
 
@@ -113,6 +154,7 @@ if(type=="12"){
 s1.style.display="block";
 s2.style.display="block";
 }
+
 }
 
 </script>
@@ -135,6 +177,9 @@ s2.style.display="block";
 <button onclick="bukaMurah()"> MONITORING PALING MURAH</button>
 <button onclick="bukaKWH()">MONITORING KWH</button>
 <button onclick="bukaSheet()">CEK SEMUA INPUTAN</button>
+
+<!-- TAMBAHAN: CEK INPUTAN MONITORING -->
+<button onclick="bukaCekInputan()">CEK INPUTAN MONITORING</button>
 
 <script>
 function bukaSheet(){
@@ -312,7 +357,7 @@ CEK DULU YANG BENER JANGAN ASAL ISI RIBET BENERIN NYA KALO SALAH...!
 
 
   <h4>ITEM PALING MURAH PERIODE SEKARANG</h4>
-    
+
   1.DAIA<br><input type="number" name="i1" placeholder="plu main: 20052321;20091352"> <br>
   2.EKONOMI<br><input type="number" name="i2" placeholder="plu main: 20092331;20136124"><br>
   3.FRISIAN FLAG UHT<br><input type="number" name="i3" placeholder="plu main: 20083795;20134673"><br>
@@ -323,9 +368,9 @@ CEK DULU YANG BENER JANGAN ASAL ISI RIBET BENERIN NYA KALO SALAH...!
   8.PANTENE HEAD & SHOULDERS<br><input type="number" name="i8" placeholder="plu main: 20038766;20136586"><br>
   9.TESSA<br><input type="number" name="i9" placeholder="plu main: 20113083"><br>
   10.WALLS<br><input type="number" name="i10" placeholder="plu main: 20032368;20134926"><br>
-  
- 
-    
+
+
+
 
   <p class="warning">
     SEBELUM DI SAVE<br><br>
@@ -408,6 +453,238 @@ document.body.appendChild(form);
 form.submit();
 
 }
+</script>
+
+
+<!-- ================= TAMBAHAN CEK INPUTAN MONITORING ================= -->
+
+<div id="cekInputan" class="hidden">
+
+<h2 style="text-align:center;">CEK INPUTAN MONITORING</h2>
+
+<select id="pilihMonitoring" onchange="tampilkanMonitoring()">
+<option value="">PILIH MONITORING</option>
+<option value="sales">MONITORING SALES</option>
+<option value="murah">MONITORING PALING MURAH</option>
+<option value="kwh">MONITORING KWH</option>
+</select>
+
+<div id="judulCekMonitoring"
+style="margin-top:12px;padding:12px;background:#27ae60;color:white;border-radius:8px;text-align:center;font-weight:bold;">
+PILIH MONITORING
+</div>
+
+<div id="loadingCekMonitoring">
+⏳ MENGAMBIL DATA...
+</div>
+
+<div id="hasilCekMonitoring"></div>
+
+<button onclick="kembaliCekInputan()">KEMBALI</button>
+
+</div>
+
+
+<script>
+
+/*
+  CEK SEMUA INPUTAN tetap menggunakan tombol lama.
+  Bagian ini hanya menambahkan tombol:
+  CEK INPUTAN MONITORING
+*/
+
+const scriptMonitoring =
+"https://script.google.com/macros/s/AKfycbzglrN9ibDnbI3o4zwmrrxiFZjaZeTHnkvgMMpxhe0/dev";
+
+
+function bukaCekInputan(){
+
+document.getElementById("menu").style.display="none";
+
+document.getElementById("sales").style.display="none";
+document.getElementById("murah").style.display="none";
+document.getElementById("kwh").style.display="none";
+
+document.getElementById("cekInputan").style.display="block";
+
+}
+
+
+function kembaliCekInputan(){
+
+document.getElementById("cekInputan").style.display="none";
+
+document.getElementById("menu").style.display="block";
+
+document.getElementById("pilihMonitoring").value="";
+
+document.getElementById("hasilCekMonitoring").innerHTML="";
+
+document.getElementById("judulCekMonitoring").innerHTML=
+"PILIH MONITORING";
+
+}
+
+
+function tampilkanMonitoring(){
+
+let pilihan=document.getElementById("pilihMonitoring").value;
+let hasil=document.getElementById("hasilCekMonitoring");
+let judul=document.getElementById("judulCekMonitoring");
+let loading=document.getElementById("loadingCekMonitoring");
+
+hasil.innerHTML="";
+
+if(!pilihan){
+judul.innerHTML="PILIH MONITORING";
+return;
+}
+
+loading.style.display="block";
+
+if(pilihan=="sales"){
+judul.innerHTML="MONITORING SALES";
+ambilStyledRange("Web Monitoring","A1:AE33");
+}
+
+if(pilihan=="murah"){
+judul.innerHTML="MONITORING PALING MURAH";
+ambilStyledRange("Monitoring Paling Murah","A1:V26");
+}
+
+if(pilihan=="kwh"){
+judul.innerHTML="MONITORING KWH";
+ambilStyledRange("KWH","A1:F40");
+}
+
+}
+
+
+function ambilStyledRange(sheet,range){
+
+let callbackName="monitoringStyledCallback_"+Date.now();
+
+window[callbackName]=function(data){
+
+document.getElementById("loadingCekMonitoring").style.display="none";
+
+try{
+
+if(!data || !data.ok){
+document.getElementById("hasilCekMonitoring").innerHTML=
+"<div style='padding:20px;text-align:center;color:red;'>"+
+escapeHTML((data && data.message) || "DATA TIDAK DAPAT DIAMBIL")+
+"</div>";
+return;
+}
+
+buatTabelStyled(data);
+
+}catch(err){
+
+document.getElementById("hasilCekMonitoring").innerHTML=
+"<div style='padding:20px;text-align:center;color:red;'>"+
+"TERJADI KESALAHAN: "+escapeHTML(err.message)+
+"</div>";
+
+}
+
+delete window[callbackName];
+if(script && script.parentNode) script.remove();
+
+};
+
+let url=scriptMonitoring+
+"?action=styledRange"+
+"&sheet="+encodeURIComponent(sheet)+
+"&range="+encodeURIComponent(range)+
+"&callback="+encodeURIComponent(callbackName);
+
+let script=document.createElement("script");
+script.src=url;
+
+script.onerror=function(){
+
+document.getElementById("loadingCekMonitoring").style.display="none";
+
+document.getElementById("hasilCekMonitoring").innerHTML=
+"<div style='padding:20px;text-align:center;color:red;'>"+
+"GAGAL TERHUBUNG KE APPS SCRIPT"+
+"</div>";
+
+delete window[callbackName];
+script.remove();
+
+};
+
+document.body.appendChild(script);
+
+}
+
+
+function buatTabelStyled(data){
+
+let hasil=document.getElementById("hasilCekMonitoring");
+
+if(!data.values || !data.values.length){
+hasil.innerHTML=
+"<div style='padding:20px;text-align:center;'>DATA KOSONG</div>";
+return;
+}
+
+let hiddenCols=data.hiddenColumns || [];
+let hiddenRows=data.hiddenRows || [];
+let widths=data.columnWidths || [];
+let styles=data.styles || [];
+
+let html="<table style='border-collapse:collapse;width:max-content;min-width:100%;font-size:12px;'>";
+
+for(let r=0;r<data.values.length;r++){
+
+if(hiddenRows.indexOf(r+1)!==-1) continue;
+
+html+="<tr>";
+
+for(let c=0;c<data.values[r].length;c++){
+
+if(hiddenCols.indexOf(c+1)!==-1) continue;
+
+let cellStyle=(styles[r] && styles[r][c]) ? styles[r][c] : "";
+let width=(widths[c] ? "width:"+widths[c]+"px;min-width:"+widths[c]+"px;" : "");
+
+let tag=(r===0 ? "th" : "td");
+
+html+="<"+tag+" style='"+width+cellStyle+
+"white-space:pre-wrap;box-sizing:border-box;'>"+
+escapeHTML(data.values[r][c])+
+"</"+tag+">";
+
+}
+
+html+="</tr>";
+}
+
+html+="</table>";
+
+hasil.innerHTML=html;
+
+}
+
+
+function escapeHTML(value){
+
+if(value===null || value===undefined)
+return "";
+
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
 </script>
 
 </body>
