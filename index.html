@@ -176,10 +176,10 @@ s2.style.display="block";
 <div id="menu">
 
 <button onclick="bukaSales()"> INPUT MONITORING SALES</button>
-<button onclick="bukaMurah()"> INPUT MONITORING PALING MURAH</button>
+<button onclick="bukaMurah()">INPUT MONITORING PALING MURAH</button>
 <button onclick="bukaKWH()">INPUT MONITORING KWH</button>
-<button onclick="bukaCekInputan()">CEK INPUTAN</button>
-<button onclick="bukaSheet()">MASUK KE SPREADSHEET</button>
+<button onclick="bukaCekInputan()">CEK INPUTAN </button>
+<button onclick="bukaSheet()">MASUK SPREADSHEET</button>
 
 <!-- TAMBAHAN: CEK INPUTAN MONITORING -->
 
@@ -477,11 +477,12 @@ PILIH MONITORING
 </div>
 
 <div id="loadingCekMonitoring">
-⏳ SABAR BOSS DI CEK DULU...
+⏳ SABAR BOSS GUA BUATIN TABEL NYA DULU BUAT LU...
 </div>
 
 <div id="hasilCekMonitoring"></div>
 
+<button id="btnRincianWA" onclick="buatRincianWhatsApp()" style="display:none;background:#128C7E;margin-top:10px;">LANGSUNG LAPORAN DI WHATSAPP!!!</button>
 <button onclick="kembaliCekInputan()">KEMBALI</button>
 
 </div>
@@ -536,6 +537,8 @@ let judul=document.getElementById("judulCekMonitoring");
 let loading=document.getElementById("loadingCekMonitoring");
 
 hasil.innerHTML="";
+document.getElementById("btnRincianWA").style.display="none";
+window.dataMonitoringAktif=null;
 
 if(!pilihan){
 judul.innerHTML="PILIH MONITORING";
@@ -580,6 +583,9 @@ escapeHTML((data && data.message) || "DATA TIDAK DAPAT DIAMBIL")+
 return;
 }
 
+window.dataMonitoringAktif = data;
+window.jenisMonitoringAktif = document.getElementById("pilihMonitoring").value;
+document.getElementById("btnRincianWA").style.display=(window.jenisMonitoringAktif==="murah" ? "block" : "none");
 buatTabelStyled(data);
 
 }catch(err){
@@ -623,6 +629,105 @@ document.body.appendChild(script);
 
 }
 
+
+function nilaiSel(data,row,col){
+  if(!data || !data.values || !data.values[row-1]) return "";
+  return String(data.values[row-1][col-1] == null ? "" : data.values[row-1][col-1]).trim();
+}
+
+function buatTeksPalingMurah(data){
+
+  var out=[];
+  out.push("*PALING MURAH*");
+
+  if(!data || !data.values || !data.values.length){
+    return out.concat(["Data tidak ditemukan."]).join("\n");
+  }
+
+  // Data master tetap dibaca dari kolom yang di-hide:
+  // B = nama item, C = target, E = kekurangan, F = ACV.
+  // Nilai tersembunyi tetap dikirim Apps Script meskipun tidak dirender sebagai kolom.
+  var latestPairCol=0;
+  var latestDate="";
+
+  // Tiap tanggal/input menempati sepasang kolom:
+  // I:J, K:L, M:N, O:P, Q:R, S:T, U:V.
+  // InputMurah mengisi pasangan yang tanggalnya sama; pasangan paling kanan
+  // yang memiliki tanggal adalah input yang terakhir tersimpan.
+  for(var c=9;c<=21;c+=2){
+    var date=nilaiSel(data,4,c);
+    if(date!==""){
+      latestPairCol=c;
+      latestDate=date;
+    }
+  }
+
+  if(!latestPairCol){
+    return out.concat(["Belum ada inputan paling murah."]).join("\n");
+  }
+
+  var shift1Col=latestPairCol;
+  var shift2Col=latestPairCol+1;
+
+  // Nama toko/kode toko tidak bisa dipastikan dari kolom yang disebutkan,
+  // jadi gunakan tanggal input sebagai identitas yang pasti tersedia.
+  out.push("*Tanggal: "+latestDate+"*");
+  out.push("");
+  out.push("*Item_Target_Shift1_Shift2_ACV_Kekurangan*");
+
+  for(var r=6;r<=25;r++){
+
+    var item=nilaiSel(data,r,2);       // B6:B25
+    var target=nilaiSel(data,r,3);     // C6:C25
+    var kekurangan=nilaiSel(data,r,5);// E6:E25
+    var acv=nilaiSel(data,r,6);        // F6:F25
+
+    // Tambahkan tanda persen ke ACV jika belum ada.
+    if(acv!=="" && acv!=="-" && !acv.includes("%")){
+      acv=acv+"%";
+    }
+
+    var sales1=nilaiSel(data,r,shift1Col);
+    var sales2=nilaiSel(data,r,shift2Col);
+
+    // Jika Shift 1 yang baru diisi, Shift 2 ditampilkan 0.
+    if(sales1==="") sales1="0";
+    if(sales2==="") sales2="0";
+
+    // Hanya tampilkan baris yang memiliki nama item di kolom B.
+    // Baris kosong bisa tetap memiliki formula di E/F yang menghasilkan #DIV/0!,
+    // jadi nilai formula tersebut tidak boleh membuat baris kosong ikut dikirim.
+    if(item===""){
+      continue;
+    }
+
+    out.push(
+      item+"_"+target+"_"+sales1+"_"+sales2+"_"+acv+"_"+kekurangan
+    );
+  }
+
+  return out.join("\n");
+}
+
+function buatRincianWhatsApp(){
+
+  var data=window.dataMonitoringAktif;
+  var jenis=window.jenisMonitoringAktif;
+
+  if(jenis!=="murah"){
+    alert("Fitur rincian WhatsApp ini khusus MONITORING PALING MURAH. Pilih MONITORING PALING MURAH terlebih dahulu.");
+    return;
+  }
+
+  if(!data || !data.values){
+    alert("Ambil data MONITORING PALING MURAH terlebih dahulu.");
+    return;
+  }
+
+  var teks=buatTeksPalingMurah(data);
+  var url="https://wa.me/?text="+encodeURIComponent(teks);
+  window.open(url,"_blank");
+}
 
 function buatTabelStyled(data){
 
