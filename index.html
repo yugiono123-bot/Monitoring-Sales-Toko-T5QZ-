@@ -672,8 +672,30 @@ function buatTeksPalingMurah(data){
 
   // Nama toko/kode toko tidak bisa dipastikan dari kolom yang disebutkan,
   // jadi gunakan tanggal input sebagai identitas yang pasti tersedia.
-  out.push("*Tanggal: "+latestDate+"*");
-  out.push("");
+out.push("*Tanggal: "+latestDate+"*");
+
+var adaShift1 = false;
+var adaShift2 = false;
+
+for (var r = 6; r <= 25; r++) {
+if (nilaiSel(data, r, shift1Col) !== "") {
+adaShift1 = true;
+}
+
+if (nilaiSel(data, r, shift2Col) !== "") {
+adaShift2 = true;
+}
+}
+
+if (adaShift2) {
+out.push("*SHIFT 2*");
+} else if (adaShift1) {
+out.push("*SHIFT 1*");
+}
+
+out.push("");
+out.push("*Item_Target_Shift1_Shift2_ACV_Kekurangan*");
+
   out.push("*Item_Target_Shift1_Shift2_ACV_Kekurangan*");
 
   for(var r=6;r<=25;r++){
