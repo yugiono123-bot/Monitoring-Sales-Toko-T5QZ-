@@ -643,95 +643,91 @@ function nilaiSel(data,row,col){
   return String(data.values[row-1][col-1] == null ? "" : data.values[row-1][col-1]).trim();
 }
 
-function buatTeksPalingMurah(data){
 
-  var out=[];
+function buatTeksPalingMurah(data) {
+  var out = [];
+
   out.push("*LAPORAN PALING MURAH*");
-    out.push("*T5QZ/RAWA BEBEK*");
+  out.push("*T5QZ/RAWA BEBEK*");
 
-  if(!data || !data.values || !data.values.length){
-    return out.concat(["Data tidak ditemukan."]).join("\n");
+  if (!data || !data.values || !data.values.length) {
+    out.push("Data tidak ditemukan.");
+    return out.join("\n");
   }
 
-  // Data master tetap dibaca dari kolom yang di-hide:
-  // B = nama item, C = target, E = kekurangan, F = ACV.
-  // Nilai tersembunyi tetap dikirim Apps Script meskipun tidak dirender sebagai kolom.
-  var latestPairCol=0;
-  var latestDate="";
+  function nilai(row, col) {
+    if (!data.values[row - 1]) return "";
+    var v = data.values[row - 1][col - 1];
+    return v == null ? "" : String(v).trim();
+  }
 
-  // Tiap tanggal/input menempati sepasang kolom:
-  // I:J, K:L, M:N, O:P, Q:R, S:T, U:V.
-  // InputMurah mengisi pasangan yang tanggalnya sama; pasangan paling kanan
-  // yang memiliki tanggal adalah input yang terakhir tersimpan.
-  for(var c=9;c<=21;c+=2){
-    var date=nilaiSel(data,4,c);
-    if(date!==""){
-      latestPairCol=c;
-      latestDate=date;
+  // Cari pasangan kolom tanggal terakhir.
+  var kolomShift1 = 0;
+  var tanggal = "";
+
+  for (var c = 9; c <= 21; c += 2) {
+    var t = nilai(4, c);
+
+    if (t !== "") {
+      kolomShift1 = c;
+      tanggal = t;
     }
   }
 
-  if(!latestPairCol){
-    return out.concat(["Belum ada inputan paling murah."]).join("\n");
+  if (!kolomShift1) {
+    out.push("Belum ada inputan paling murah.");
+    return out.join("\n");
   }
 
-  var shift1Col=latestPairCol;
-  var shift2Col=latestPairCol+1;
+  var kolomShift2 = kolomShift1 + 1;
 
-  // Nama toko/kode toko tidak bisa dipastikan dari kolom yang disebutkan,
-  // jadi gunakan tanggal input sebagai identitas yang pasti tersedia.
-out.push("*Tanggal: "+latestDate+"*");
+  // Tentukan shift terakhir yang memiliki input.
+  var adaShift2 = false;
 
-var adaShift1 = false;
-var adaShift2 = false;
-
-for (var r = 6; r <= 25; r++) {
-if (nilaiSel(data, r, shift1Col) !== "") {
-adaShift1 = true;
-}
-
-if (nilaiSel(data, r, shift2Col) !== "") {
-adaShift2 = true;
-}
-}
-
-if (adaShift2) {
-out.push("*SHIFT 2*");
-} else if (adaShift1) {
-out.push("*SHIFT 1*");
-}
-
-out.push("");
-out.push("*Item_Target_Shift1_Shift2_Acv_Kekurangan*");
-
-  for(var r=6;r<=25;r++){
-
-    var item=nilaiSel(data,r,2);       // B6:B25
-    var target=nilaiSel(data,r,3);     // C6:C25
-    var kekurangan=nilaiSel(data,r,5);// E6:E25
-    var acv=nilaiSel(data,r,6);        // F6:F25
-
-    // Tambahkan tanda persen ke ACV jika belum ada.
-    if(acv!=="" && acv!=="-" && !acv.includes("%")){
-      acv=acv+"%";
+  for (var r = 6; r <= 25; r++) {
+    if (
+      nilai(r, 2) !== "" &&
+      nilai(r, kolomShift2) !== ""
+    ) {
+      adaShift2 = true;
+      break;
     }
+  }
 
-    var sales1=nilaiSel(data,r,shift1Col);
-    var sales2=nilaiSel(data,r,shift2Col);
+  out.push("*Tanggal: " + tanggal + "*");
+  out.push(adaShift2 ? "*SHIFT 2*" : "*SHIFT 1*");
+  out.push("");
+  out.push("*Item_Target_Shift1_Shift2_Acv_Kekurangan*");
 
-    // Jika Shift 1 yang baru diisi, Shift 2 ditampilkan 0.
-    if(sales1==="") sales1="0";
-    if(sales2==="") sales2="0";
+  for (var r = 6; r <= 25; r++) {
+    var item = nilai(r, 2);
 
-    // Hanya tampilkan baris yang memiliki nama item di kolom B.
-    // Baris kosong bisa tetap memiliki formula di E/F yang menghasilkan #DIV/0!,
-    // jadi nilai formula tersebut tidak boleh membuat baris kosong ikut dikirim.
-    if(item===""){
-      continue;
-    }
+    if (item === "") continue;
 
+    var target = nilai(r, 3);
+    var shift1 = nilai(r, kolomShift1) || "0";
+    var shift2 = nilai(r, kolomShift2) || "0";
+    var acv = nilai(r, 6);
+    var kurang = nilai(r, 5);
+
+    // Periksa ACV, termasuk format desimal dan persen.
+    var angkaACV = parseFloat(
+      acv.replace(/%/g, "").replace(",", ".")
+    );
+
+    var centang =
+      !isNaN(angkaACV) && angkaACV >= 100
+        ? "✅"
+        : "";
+
+    // Centang diletakkan setelah angka kekurangan.
     out.push(
-      item+"_"+target+"_"+sales1+"_"+sales2+"_"+acv+"_"+kekurangan
+      item + "_" +
+      target + "_" +
+      shift1 + "_" +
+      shift2 + "_" +
+      acv + "_" +
+      kurang + centang
     );
   }
 
