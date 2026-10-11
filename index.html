@@ -106,8 +106,22 @@ vertical-align:middle;
 #loadingCekMonitoring{
 display:none;
 text-align:center;
-padding:20px;
-font-weight:bold;
+padding:24px 12px;
+font-size:24px !important;
+line-height:1.5;
+font-weight:900 !important;
+color:#222;
+}
+.stikerJoget{
+  display:inline-block;
+  font-size:44px;
+  margin:8px 12px;
+  animation:jogetBoss .55s ease-in-out infinite alternate;
+}
+.stikerJoget:nth-child(2){animation-delay:.2s}
+@keyframes jogetBoss{
+  from{transform:rotate(-18deg) translateY(0) scale(1)}
+  to{transform:rotate(18deg) translateY(-10px) scale(1.12)}
 }
 
 </style>
@@ -477,7 +491,8 @@ PILIH MONITORING
 </div>
 
 <div id="loadingCekMonitoring">
-⏳ SABAR BOSS GUA BUATIN TABEL NYA DULU BUAT LU...
+  <div><span class="stikerJoget">💃</span><span class="stikerJoget">🕺</span></div>
+  SABAR YA BOSS LAGI GUA BIKININ LAPORAN PENJUALAN LOE
 </div>
 
 <div id="hasilCekMonitoring"></div>
@@ -553,7 +568,7 @@ function tampilkanMonitoring(){
   window.jendelaWhatsAppMenunggu = window.open("about:blank", "_blank");
   if (window.jendelaWhatsAppMenunggu) {
     window.jendelaWhatsAppMenunggu.document.write(
-      "<p style='font-family:Arial;text-align:center;margin-top:40px'>Mengambil data monitoring...</p>"
+      "<!doctype html><html><head><meta name=\'viewport\' content=\'width=device-width, initial-scale=1\'><style>html,body{margin:0;width:100%;height:100%;font-family:Arial,sans-serif}body{display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;box-sizing:border-box;font-size:24px;font-weight:900;line-height:1.5;color:#222}p{margin:0}.dance{display:inline-block;font-size:48px;margin:8px;animation:dance .55s ease-in-out infinite alternate}.dance:nth-child(2){animation-delay:.2s}@keyframes dance{from{transform:rotate(-18deg) translateY(0)}to{transform:rotate(18deg) translateY(-10px)}}</style></head><body><p><span class=\'dance\'>💃</span><span class=\'dance\'>🕺</span><br>SABAR YA BOSS LAGI GUA BIKININ LAPORAN PENJUALAN LOE</p></body></html>"
     );
   }
 
