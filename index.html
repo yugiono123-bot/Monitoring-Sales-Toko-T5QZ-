@@ -482,14 +482,7 @@ PILIH MONITORING
 
 <div id="hasilCekMonitoring"></div>
 
-<button id="btnRincianWA" onclick="buatRincianWhatsApp()" style="display:none;background:#128C7E;margin-top:10px;">LANGSUNG LAPORAN DI WHATSAPP!!!</button>
 
-<button
-  type="button"
-  onclick="window.location.href=scriptMonitoring+'?action=whatsappMurah'"
-  style="background:#128C7E;margin-top:10px">
-  AMBIL DATA & KIRIM WHATSAPP
-</button>
 
 <button onclick="kembaliCekInputan()">KEMBALI</button>
 
@@ -537,106 +530,129 @@ document.getElementById("judulCekMonitoring").innerHTML=
 }
 
 
+// Menyimpan tab WhatsApp yang dibuka saat pengguna memilih jenis monitoring.
+window.jendelaWhatsAppMenunggu = null;
+
 function tampilkanMonitoring(){
+  var pilihan = document.getElementById("pilihMonitoring").value;
+  var judul = document.getElementById("judulCekMonitoring");
+  var loading = document.getElementById("loadingCekMonitoring");
+  var hasil = document.getElementById("hasilCekMonitoring");
 
-let pilihan=document.getElementById("pilihMonitoring").value;
-let hasil=document.getElementById("hasilCekMonitoring");
-let judul=document.getElementById("judulCekMonitoring");
-let loading=document.getElementById("loadingCekMonitoring");
+  hasil.innerHTML = "";
+  window.dataMonitoringAktif = null;
+  window.jenisMonitoringAktif = pilihan;
 
-hasil.innerHTML="";
-document.getElementById("btnRincianWA").style.display="none";
-window.dataMonitoringAktif=null;
+  if (!pilihan) {
+    judul.innerHTML = "PILIH MONITORING";
+    loading.style.display = "none";
+    return;
+  }
 
-if(!pilihan){
-judul.innerHTML="PILIH MONITORING";
-return;
+  // Buka tab secara langsung saat pilihan disentuh agar tidak diblokir popup blocker.
+  window.jendelaWhatsAppMenunggu = window.open("about:blank", "_blank");
+  if (window.jendelaWhatsAppMenunggu) {
+    window.jendelaWhatsAppMenunggu.document.write(
+      "<p style='font-family:Arial;text-align:center;margin-top:40px'>Mengambil data monitoring...</p>"
+    );
+  }
+
+  loading.style.display = "block";
+  judul.innerHTML = "MENGAMBIL DATA " + pilihan.toUpperCase() + "...";
+
+  if (pilihan === "sales") {
+    ambilStyledRange("Web Monitoring", "A1:AE33");
+  } else if (pilihan === "murah") {
+    ambilStyledRange("Monitoring Paling Murah", "A1:V26");
+  } else if (pilihan === "kwh") {
+    ambilStyledRange("KWH", "A1:G41");
+  }
 }
 
-loading.style.display="block";
+function ambilStyledRange(sheet, range){
+  var callbackName = "monitoringStyledCallback_" + Date.now();
+  var script = document.createElement("script");
+  var selesai = false;
 
-if(pilihan=="sales"){
-judul.innerHTML="MONITORING SALES";
-ambilStyledRange("Web Monitoring","A1:AE33");
+  window[callbackName] = function(data){
+    if (selesai) return;
+    selesai = true;
+    document.getElementById("loadingCekMonitoring").style.display = "none";
+
+    if (!data || !data.ok) {
+      var pesanError = (data && data.message) || "DATA TIDAK DAPAT DIAMBIL";
+      document.getElementById("judulCekMonitoring").innerHTML = "GAGAL MENGAMBIL DATA";
+      document.getElementById("hasilCekMonitoring").innerHTML =
+        "<div style='padding:12px;color:red'>" + escapeHTML(pesanError) + "</div>";
+      if (window.jendelaWhatsAppMenunggu && !window.jendelaWhatsAppMenunggu.closed) {
+        window.jendelaWhatsAppMenunggu.close();
+      }
+      delete window[callbackName];
+      if (script.parentNode) script.remove();
+      return;
+    }
+
+    window.dataMonitoringAktif = data;
+    var jenis = window.jenisMonitoringAktif;
+    var teks = "";
+
+    if (jenis === "murah") {
+      teks = buatTeksPalingMurah(data);
+    } else if (jenis === "sales") {
+      teks = buatTeksUmumWhatsApp(data, "LAPORAN MONITORING SALES");
+    } else if (jenis === "kwh") {
+      teks = buatTeksUmumWhatsApp(data, "LAPORAN MONITORING KWH");
+    }
+
+    document.getElementById("judulCekMonitoring").innerHTML = "DATA SIAP — MENGALIHKAN KE WHATSAPP";
+    document.getElementById("hasilCekMonitoring").innerHTML =
+      "<div style='padding:12px;text-align:center'>Data berhasil diambil. Membuka draft WhatsApp...</div>";
+
+    var urlWA = "https://wa.me/?text=" + encodeURIComponent(teks);
+    if (window.jendelaWhatsAppMenunggu && !window.jendelaWhatsAppMenunggu.closed) {
+      window.jendelaWhatsAppMenunggu.location.href = urlWA;
+    } else {
+      // Fallback bila browser memblokir jendela baru.
+      window.location.href = urlWA;
+    }
+
+    delete window[callbackName];
+    if (script.parentNode) script.remove();
+  };
+
+  var url = scriptMonitoring +
+    "?action=styledRange" +
+    "&sheet=" + encodeURIComponent(sheet) +
+    "&range=" + encodeURIComponent(range) +
+    "&callback=" + encodeURIComponent(callbackName);
+  script.src = url;
+  script.onerror = function(){
+    if (selesai) return;
+    selesai = true;
+    document.getElementById("loadingCekMonitoring").style.display = "none";
+    document.getElementById("judulCekMonitoring").innerHTML = "GAGAL TERHUBUNG KE APPS SCRIPT";
+    if (window.jendelaWhatsAppMenunggu && !window.jendelaWhatsAppMenunggu.closed) {
+      window.jendelaWhatsAppMenunggu.close();
+    }
+    delete window[callbackName];
+    if (script.parentNode) script.remove();
+  };
+  document.body.appendChild(script);
 }
 
-if(pilihan=="murah"){
-judul.innerHTML="MONITORING PALING MURAH";
-ambilStyledRange("Monitoring Paling Murah","A1:V26");
+function buatTeksUmumWhatsApp(data, judul){
+  var out = ["*" + judul + "*"];
+  if (!data || !data.values || !data.values.length) {
+    return out.concat(["Data tidak ditemukan."]).join("\n");
+  }
+  data.values.forEach(function(row){
+    var isi = (row || []).map(function(v){
+      return v == null ? "" : String(v).trim();
+    }).filter(function(v){ return v !== ""; });
+    if (isi.length) out.push(isi.join(" | "));
+  });
+  return out.join("\n");
 }
-
-if(pilihan=="kwh"){
-judul.innerHTML="MONITORING KWH";
-ambilStyledRange("KWH","A1:G41");
-}
-
-}
-
-
-function ambilStyledRange(sheet,range){
-
-let callbackName="monitoringStyledCallback_"+Date.now();
-
-window[callbackName]=function(data){
-
-document.getElementById("loadingCekMonitoring").style.display="none";
-
-try{
-
-if(!data || !data.ok){
-document.getElementById("hasilCekMonitoring").innerHTML=
-"<div style='padding:20px;text-align:center;color:red;'>"+
-escapeHTML((data && data.message) || "DATA TIDAK DAPAT DIAMBIL")+
-"</div>";
-return;
-}
-
-window.dataMonitoringAktif = data;
-window.jenisMonitoringAktif = document.getElementById("pilihMonitoring").value;
-document.getElementById("btnRincianWA").style.display=(window.jenisMonitoringAktif==="murah" ? "block" : "none");
-buatTabelStyled(data);
-
-}catch(err){
-
-document.getElementById("hasilCekMonitoring").innerHTML=
-"<div style='padding:20px;text-align:center;color:red;'>"+
-"TERJADI KESALAHAN: "+escapeHTML(err.message)+
-"</div>";
-
-}
-
-delete window[callbackName];
-if(script && script.parentNode) script.remove();
-
-};
-
-let url=scriptMonitoring+
-"?action=styledRange"+
-"&sheet="+encodeURIComponent(sheet)+
-"&range="+encodeURIComponent(range)+
-"&callback="+encodeURIComponent(callbackName);
-
-let script=document.createElement("script");
-script.src=url;
-
-script.onerror=function(){
-
-document.getElementById("loadingCekMonitoring").style.display="none";
-
-document.getElementById("hasilCekMonitoring").innerHTML=
-"<div style='padding:20px;text-align:center;color:red;'>"+
-"GAGAL TERHUBUNG KE APPS SCRIPT"+
-"</div>";
-
-delete window[callbackName];
-script.remove();
-
-};
-
-document.body.appendChild(script);
-
-}
-
 
 function nilaiSel(data,row,col){
   if(!data || !data.values || !data.values[row-1]) return "";
@@ -645,11 +661,7 @@ function nilaiSel(data,row,col){
 
 
 function buatTeksPalingMurah(data) {
-  var out = [];
-
-  out.push("*LAPORAN PALING MURAH*");
-  out.push("*T5QZ/RAWA BEBEK*");
-
+  var out = ["*LAPORAN PALING MURAH*", "*T5QZ/RAWA BEBEK*"];
   if (!data || !data.values || !data.values.length) {
     out.push("Data tidak ditemukan.");
     return out.join("\n");
@@ -661,34 +673,24 @@ function buatTeksPalingMurah(data) {
     return v == null ? "" : String(v).trim();
   }
 
-  // Cari pasangan kolom tanggal terakhir.
   var kolomShift1 = 0;
   var tanggal = "";
-
   for (var c = 9; c <= 21; c += 2) {
     var t = nilai(4, c);
-
     if (t !== "") {
       kolomShift1 = c;
       tanggal = t;
     }
   }
-
   if (!kolomShift1) {
     out.push("Belum ada inputan paling murah.");
     return out.join("\n");
   }
 
   var kolomShift2 = kolomShift1 + 1;
-
-  // Tentukan shift terakhir yang memiliki input.
   var adaShift2 = false;
-
   for (var r = 6; r <= 25; r++) {
-    if (
-      nilai(r, 2) !== "" &&
-      nilai(r, kolomShift2) !== ""
-    ) {
+    if (nilai(r, 2) !== "" && nilai(r, kolomShift2) !== "") {
       adaShift2 = true;
       break;
     }
@@ -701,57 +703,19 @@ function buatTeksPalingMurah(data) {
 
   for (var r = 6; r <= 25; r++) {
     var item = nilai(r, 2);
-
-    if (item === "") continue;
+    if (!item) continue;
 
     var target = nilai(r, 3);
     var shift1 = nilai(r, kolomShift1) || "0";
     var shift2 = nilai(r, kolomShift2) || "0";
     var acv = nilai(r, 6);
     var kurang = nilai(r, 5);
+    var angkaACV = parseFloat(acv.replace(/%/g, "").replace(",", "."));
+    var centang = (!isNaN(angkaACV) && angkaACV >= 100) ? "✅" : "";
 
-    // Periksa ACV, termasuk format desimal dan persen.
-    var angkaACV = parseFloat(
-      acv.replace(/%/g, "").replace(",", ".")
-    );
-
-    var centang =
-      !isNaN(angkaACV) && angkaACV >= 100
-        ? "✅"
-        : "";
-
-    // Centang diletakkan setelah angka kekurangan.
-    out.push(
-      item + "_" +
-      target + "_" +
-      shift1 + "_" +
-      shift2 + "_" +
-      acv + "_" +
-      kurang + centang
-    );
+    out.push(item + "_" + target + "_" + shift1 + "_" + shift2 + "_" + acv + "_" + kurang + centang);
   }
-
   return out.join("\n");
-}
-
-function buatRincianWhatsApp(){
-
-  var data=window.dataMonitoringAktif;
-  var jenis=window.jenisMonitoringAktif;
-
-  if(jenis!=="murah"){
-    alert("Fitur rincian WhatsApp ini khusus MONITORING PALING MURAH. Pilih MONITORING PALING MURAH terlebih dahulu.");
-    return;
-  }
-
-  if(!data || !data.values){
-    alert("Ambil data MONITORING PALING MURAH terlebih dahulu.");
-    return;
-  }
-
-  var teks=buatTeksPalingMurah(data);
-  var url="https://wa.me/?text="+encodeURIComponent(teks);
-  window.open(url,"_blank");
 }
 
 function buatTabelStyled(data){
