@@ -481,8 +481,8 @@ form.submit();
 <label for="modePerangkat" style="display:block;font-weight:bold;margin:8px 0;">PILIH PERANGKAT</label>
 <select id="modePerangkat" onchange="gantiModePerangkat()">
 <option value="">PILIH ANDROID / IPHONE</option>
-<option value="android">ANDROID</option>
-<option value="iphone">IPHONE BUTUT</option>
+<option value="android">ANDROID — TABEL + DRAFT WHATSAPP</option>
+<option value="iphone">IPHONE — LANGSUNG KE WHATSAPP</option>
 </select>
 
 <div id="bagianPilihMonitoring" style="display:none;">
@@ -505,7 +505,7 @@ PILIH MONITORING
 </div>
 
 <div id="hasilCekMonitoring"></div>
-<button id="btnDraftWhatsApp" style="display:none;background:#128C7E;font-weight:bold;" onclick="bukaDraftWhatsApp()">KIRIM KE WHATSAPP</button>
+<button id="btnDraftWhatsApp" style="display:none;background:#128C7E;font-weight:bold;" onclick="bukaDraftWhatsApp()">BUKA DRAFT WHATSAPP</button>
 
 <button onclick="kembaliCekInputan()">KEMBALI</button>
 
@@ -638,9 +638,27 @@ function ambilStyledRange(sheet, range){
   var script = document.createElement("script");
   var selesai = false;
 
+  // Batas waktu supaya iPhone tidak berhenti loading selamanya.
+  var timerTimeout = setTimeout(function(){
+    if (selesai) return;
+    selesai = true;
+    document.getElementById("loadingCekMonitoring").style.display = "none";
+    document.getElementById("judulCekMonitoring").innerHTML = "KONEKSI TIMEOUT — DATA TIDAK BERHASIL DIAMBIL";
+    var hasilTimeout = document.getElementById("hasilCekMonitoring");
+    if (modeTerpilihIPhone()) {
+      hasilTimeout.style.display = "none"; // mode iPhone tidak membuat/menampilkan tabel
+    } else {
+      hasilTimeout.style.display = "block";
+      hasilTimeout.innerHTML = "<div style='padding:12px;color:#b00020'>Koneksi ke Apps Script melewati 15 detik. Coba ulangi.</div>";
+    }
+    delete window[callbackName];
+    if (script.parentNode) script.remove();
+  }, 15000);
+
   window[callbackName] = function(data){
     if (selesai) return;
     selesai = true;
+    clearTimeout(timerTimeout);
     document.getElementById("loadingCekMonitoring").style.display = "none";
 
     if (!data || !data.ok) {
@@ -705,6 +723,7 @@ function ambilStyledRange(sheet, range){
   script.onerror = function(){
     if (selesai) return;
     selesai = true;
+    clearTimeout(timerTimeout);
     document.getElementById("loadingCekMonitoring").style.display = "none";
     document.getElementById("judulCekMonitoring").innerHTML = "GAGAL TERHUBUNG KE APPS SCRIPT";
     delete window[callbackName];
