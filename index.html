@@ -478,15 +478,24 @@ form.submit();
 
 <h2 style="text-align:center;">CEK INPUTAN MONITORING</h2>
 
+<label for="modePerangkat" style="display:block;font-weight:bold;margin:8px 0;">PILIH PERANGKAT</label>
+<select id="modePerangkat" onchange="gantiModePerangkat()">
+<option value="">PILIH ANDROID / IPHONE</option>
+<option value="android">ANDROID — TABEL + DRAFT WHATSAPP</option>
+<option value="iphone">IPHONE — LANGSUNG KE WHATSAPP</option>
+</select>
+
+<div id="bagianPilihMonitoring" style="display:none;">
+<label for="pilihMonitoring" style="display:block;font-weight:bold;margin:8px 0;">PILIH MONITORING</label>
 <select id="pilihMonitoring" onchange="tampilkanMonitoring()">
 <option value="">PILIH MONITORING</option>
 <option value="sales">MONITORING SALES</option>
 <option value="murah">MONITORING PALING MURAH</option>
 <option value="kwh">MONITORING KWH</option>
 </select>
+</div>
 
-<div id="judulCekMonitoring"
-style="margin-top:12px;padding:12px;background:#27ae60;color:white;border-radius:8px;text-align:center;font-weight:bold;">
+<div id="judulCekMonitoring" style="display:none;">
 PILIH MONITORING
 </div>
 
@@ -535,6 +544,8 @@ document.getElementById("cekInputan").style.display="none";
 document.getElementById("menu").style.display="block";
 
 document.getElementById("pilihMonitoring").value="";
+document.getElementById("modePerangkat").value="";
+document.getElementById("bagianPilihMonitoring").style.display="none";
 
 document.getElementById("hasilCekMonitoring").innerHTML="";
 document.getElementById("btnDraftWhatsApp").style.display="none";
@@ -548,9 +559,21 @@ document.getElementById("judulCekMonitoring").innerHTML=
 
 // iPhone/iPad perlu tombol manual agar Safari tidak memblokir WhatsApp.
 window.teksDraftWhatsApp = "";
-function perangkatAppleMobile(){
-  return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+window.jendelaWhatsAppMenunggu = null;
+function modeTerpilihIPhone(){
+  return document.getElementById("modePerangkat").value === "iphone";
+}
+function gantiModePerangkat(){
+  // Tampilkan pilihan monitoring hanya setelah perangkat dipilih.
+  var mode = document.getElementById("modePerangkat").value;
+  document.getElementById("bagianPilihMonitoring").style.display = mode ? "block" : "none";
+  document.getElementById("pilihMonitoring").value = "";
+  document.getElementById("hasilCekMonitoring").innerHTML = "";
+  document.getElementById("hasilCekMonitoring").style.display = "block";
+  document.getElementById("btnDraftWhatsApp").style.display = "none";
+  document.getElementById("loadingCekMonitoring").style.display = "none";
+  document.getElementById("judulCekMonitoring").innerHTML = "PILIH MONITORING";
+  window.teksDraftWhatsApp = "";
 }
 function bukaDraftWhatsApp(){
   if(!window.teksDraftWhatsApp){ return; }
@@ -560,11 +583,33 @@ function bukaDraftWhatsApp(){
 
 function tampilkanMonitoring(){
   var pilihan = document.getElementById("pilihMonitoring").value;
+  var mode = document.getElementById("modePerangkat").value;
   var judul = document.getElementById("judulCekMonitoring");
   var loading = document.getElementById("loadingCekMonitoring");
   var hasil = document.getElementById("hasilCekMonitoring");
 
+  if (!mode) {
+    document.getElementById("pilihMonitoring").value = "";
+    judul.innerHTML = "PILIH ANDROID ATAU IPHONE TERLEBIH DAHULU";
+    return;
+  }
+
+  // Pada mode iPhone, buka tab kosong saat pilihan monitoring disentuh,
+  // lalu arahkan ke draft WhatsApp setelah data siap. Tidak merender tabel.
+  //, buka tab kosong saat pilihan disentuh (masih dalam aksi pengguna),
+  // lalu arahkan tab itu ke draft WhatsApp setelah data siap. Tidak merender tabel.
+  if (window.jendelaWhatsAppMenunggu && !window.jendelaWhatsAppMenunggu.closed) {
+    try { window.jendelaWhatsAppMenunggu.close(); } catch(e) {}
+  }
+  window.jendelaWhatsAppMenunggu = null;
+  if (pilihan && modeTerpilihIPhone()) {
+    try { window.jendelaWhatsAppMenunggu = window.open("about:blank", "_blank"); } catch(e) {}
+  }
+
   hasil.innerHTML = "";
+  hasil.style.display = "block";
+  var pesanAppleLama = document.getElementById("pesanDraftApple");
+  if (pesanAppleLama) pesanAppleLama.remove();
   document.getElementById("btnDraftWhatsApp").style.display = "none";
   window.teksDraftWhatsApp = "";
   window.dataMonitoringAktif = null;
@@ -621,15 +666,28 @@ function ambilStyledRange(sheet, range){
     }
 
     window.teksDraftWhatsApp = teks;
-    // Semua perangkat: sediakan tombol draft WhatsApp yang dibuka oleh tindakan pengguna.
-    // Android tetap menampilkan tabel; iPhone menampilkan petunjuk dan tombol draft.
+    // Android: tabel tetap seperti versi sekarang, plus tombol draft WhatsApp.
+    // iPhone: jangan panggil renderer tabel. Arahkan tab yang sudah dibuka ke WhatsApp.
     document.getElementById("btnDraftWhatsApp").style.display = "block";
 
-    if (perangkatAppleMobile()) {
-      document.getElementById("judulCekMonitoring").innerHTML = "DATA SIAP — DRAFT WHATSAPP SIAP DIBUKA";
-      document.getElementById("hasilCekMonitoring").innerHTML =
-        "<div style='padding:14px;text-align:center;font-weight:bold'>Data berhasil diambil. Tekan tombol di bawah untuk membuka draft WhatsApp.</div>";
+    if (modeTerpilihIPhone()) {
+      document.getElementById("hasilCekMonitoring").style.display = "none";
+      document.getElementById("hasilCekMonitoring").innerHTML = "";
+      document.getElementById("judulCekMonitoring").innerHTML = "MEMBUKA DRAFT WHATSAPP...";
+      var urlDraft = "https://wa.me/?text=" + encodeURIComponent(window.teksDraftWhatsApp);
+      if (window.jendelaWhatsAppMenunggu && !window.jendelaWhatsAppMenunggu.closed) {
+        window.jendelaWhatsAppMenunggu.location.href = urlDraft;
+        window.jendelaWhatsAppMenunggu = null;
+      } else {
+        // Safari memblokir tab baru? Tombol tetap jadi cadangan yang bisa ditekan.
+        document.getElementById("judulCekMonitoring").innerHTML = "DATA SIAP — TEKAN BUKA DRAFT WHATSAPP";
+        document.getElementById("hasilCekMonitoring").insertAdjacentHTML("afterend",
+          "<div id='pesanDraftApple' style='padding:14px;text-align:center;font-weight:bold'>Data siap. Tekan tombol BUKA DRAFT WHATSAPP di bawah.</div>");
+      }
     } else {
+      document.getElementById("hasilCekMonitoring").style.display = "block";
+      var pesanApple = document.getElementById("pesanDraftApple");
+      if (pesanApple) pesanApple.remove();
       document.getElementById("judulCekMonitoring").innerHTML = "DATA MONITORING BERHASIL DIAMBIL";
       buatTabelStyled(data);
     }
