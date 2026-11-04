@@ -225,7 +225,7 @@ Nama Pengisi
 <datalist id="listNama">
 <option value="YUGIONO">
 <option value="MELANI">
-<option value="DINI">
+<option value="DEDE">
 <option value="DIKA">
 <option value="JAPAR">
 </datalist>
@@ -322,7 +322,7 @@ CEK DULU YANG BENER JANGAN ASAL ISI RIBET BENERIN NYA KALO SALAH...!
 <datalist id="daftarnama">
 <option value="YUGIONO">
 <option value="MELANI">
-<option value="DINI">
+<option value="DEDE">
 <option value="DIKA">
 <option value="JAPAR">
 </datalist>
@@ -352,7 +352,7 @@ CEK DULU YANG BENER JANGAN ASAL ISI RIBET BENERIN NYA KALO SALAH...!
 <datalist id="listNama">
 <option value="YUGIONO">
 <option value="MELANI">
-<option value="DINI">
+<option value="DEDE">
 <option value="DIKA">
 <option value="JAPAR">
 </datalist>
@@ -421,6 +421,13 @@ INPUT DI JAM O6:00 - 08:00 <br>
 <input type="number" id="kwh_akhir" required>
 
 <button type="button" onclick="simpanKWH()">SIMPAN DATA</button>
+
+<button
+type="button"
+style="background:#128C7E;font-weight:bold;"
+onclick="window.open('https://script.google.com/macros/s/AKfycbzglrN9ibDnbI3o4zwmrrxiFZjaZeTHnkvgMMpxhe0/exec?action=whatsappKWH','_blank')">
+KIRIM LAPORAN KWH KE WHATSAPP
+</button>
 
 </form>
 
@@ -655,41 +662,57 @@ function ambilStyledRange(sheet, range){
 
     window.dataMonitoringAktif = data;
     var jenis = window.jenisMonitoringAktif;
-    var teks = "";
 
-    if (jenis === "murah") {
-      teks = buatTeksPalingMurah(data);
-    } else if (jenis === "sales") {
-      teks = buatTeksUmumWhatsApp(data, "LAPORAN MONITORING SALES");
-    } else if (jenis === "kwh") {
-      teks = buatTeksUmumWhatsApp(data, "LAPORAN MONITORING KWH");
+    function tampilkanHasilDanDraft(teks) {
+      window.teksDraftWhatsApp = teks || "";
+      var tombolWA = document.getElementById("btnDraftWhatsApp");
+      tombolWA.style.display = window.teksDraftWhatsApp ? "block" : "none";
+
+      if (modeTerpilihIPhone()) {
+        document.getElementById("hasilCekMonitoring").style.display = "none";
+        document.getElementById("hasilCekMonitoring").innerHTML = "";
+        document.getElementById("judulCekMonitoring").innerHTML = "MEMBUKA DRAFT WHATSAPP...";
+        var urlDraft = "https://wa.me/?text=" + encodeURIComponent(window.teksDraftWhatsApp);
+        if (window.jendelaWhatsAppMenunggu && !window.jendelaWhatsAppMenunggu.closed) {
+          window.jendelaWhatsAppMenunggu.location.href = urlDraft;
+          window.jendelaWhatsAppMenunggu = null;
+        } else {
+          document.getElementById("judulCekMonitoring").innerHTML = "DATA SIAP — TEKAN KIRIM KE WHATSAPP";
+          document.getElementById("hasilCekMonitoring").insertAdjacentHTML("afterend",
+            "<div id='pesanDraftApple' style='padding:14px;text-align:center;font-weight:bold'>Data siap. Tekan tombol KIRIM KE WHATSAPP di bawah.</div>");
+        }
+      } else {
+        document.getElementById("hasilCekMonitoring").style.display = "block";
+        var pesanApple = document.getElementById("pesanDraftApple");
+        if (pesanApple) pesanApple.remove();
+        document.getElementById("judulCekMonitoring").innerHTML = "DATA MONITORING BERHASIL DIAMBIL";
+        buatTabelStyled(data);
+      }
     }
 
-    window.teksDraftWhatsApp = teks;
-    // Android: tabel tetap seperti versi sekarang, plus tombol draft WhatsApp.
-    // iPhone: jangan panggil renderer tabel. Arahkan tab yang sudah dibuka ke WhatsApp.
-    document.getElementById("btnDraftWhatsApp").style.display = "block";
-
-    if (modeTerpilihIPhone()) {
-      document.getElementById("hasilCekMonitoring").style.display = "none";
-      document.getElementById("hasilCekMonitoring").innerHTML = "";
-      document.getElementById("judulCekMonitoring").innerHTML = "MEMBUKA DRAFT WHATSAPP...";
-      var urlDraft = "https://wa.me/?text=" + encodeURIComponent(window.teksDraftWhatsApp);
-      if (window.jendelaWhatsAppMenunggu && !window.jendelaWhatsAppMenunggu.closed) {
-        window.jendelaWhatsAppMenunggu.location.href = urlDraft;
-        window.jendelaWhatsAppMenunggu = null;
-      } else {
-        // Safari memblokir tab baru? Tombol tetap jadi cadangan yang bisa ditekan.
-        document.getElementById("judulCekMonitoring").innerHTML = "DATA SIAP — TEKAN BUKA DRAFT WHATSAPP";
-        document.getElementById("hasilCekMonitoring").insertAdjacentHTML("afterend",
-          "<div id='pesanDraftApple' style='padding:14px;text-align:center;font-weight:bold'>Data siap. Tekan tombol KIRIM KE WHATSAPP di bawah.</div>");
-      }
+    // Khusus SALES: tabel tetap dari sheet Web Monitoring,
+    // tetapi isi draft WhatsApp diambil dari sheet MONITORING SALES.
+    if (jenis === "sales") {
+      ambilLaporanSalesWhatsApp(function(resSales) {
+        if (!resSales || !resSales.ok) {
+          document.getElementById("judulCekMonitoring").innerHTML = "TABEL TAMPIL, LAPORAN SALES GAGAL";
+          document.getElementById("hasilCekMonitoring").style.display = modeTerpilihIPhone() ? "none" : "block";
+          if (!modeTerpilihIPhone()) buatTabelStyled(data);
+          var pesanErr = (resSales && resSales.message) || "Gagal mengambil sheet MONITORING SALES.";
+          document.getElementById("hasilCekMonitoring").insertAdjacentHTML("afterend",
+            "<div style='padding:10px;color:#b00020;font-weight:bold'>" + escapeHTML(pesanErr) + "</div>");
+          return;
+        }
+        tampilkanHasilDanDraft(resSales.text);
+      });
     } else {
-      document.getElementById("hasilCekMonitoring").style.display = "block";
-      var pesanApple = document.getElementById("pesanDraftApple");
-      if (pesanApple) pesanApple.remove();
-      document.getElementById("judulCekMonitoring").innerHTML = "DATA MONITORING BERHASIL DIAMBIL";
-      buatTabelStyled(data);
+      var teks = "";
+      if (jenis === "murah") {
+        teks = buatTeksPalingMurah(data);
+      } else if (jenis === "kwh") {
+        teks = buatTeksUmumWhatsApp(data, "LAPORAN MONITORING KWH");
+      }
+      tampilkanHasilDanDraft(teks);
     }
 
     delete window[callbackName];
@@ -710,6 +733,33 @@ function ambilStyledRange(sheet, range){
     delete window[callbackName];
     if (script.parentNode) script.remove();
   };
+  document.body.appendChild(script);
+}
+
+function ambilLaporanSalesWhatsApp(callback) {
+  var callbackName = "salesWhatsAppCallback_" + Date.now();
+  var script = document.createElement("script");
+  var selesai = false;
+
+  window[callbackName] = function(data) {
+    if (selesai) return;
+    selesai = true;
+    delete window[callbackName];
+    if (script.parentNode) script.remove();
+    callback(data);
+  };
+
+  script.onerror = function() {
+    if (selesai) return;
+    selesai = true;
+    delete window[callbackName];
+    if (script.parentNode) script.remove();
+    callback({ok:false, message:"Tidak bisa terhubung ke laporan MONITORING SALES."});
+  };
+
+  script.src = scriptMonitoring +
+    "?action=monitoringSalesWhatsApp" +
+    "&callback=" + encodeURIComponent(callbackName);
   document.body.appendChild(script);
 }
 
